@@ -398,4 +398,193 @@
         // Canvas partículas (fondo hero)
         function createParticles() {
             const canvas = document.getElementById('particleCanvas')
-                  
+              const ctx = canvas.getContext('2d')
+            
+            function resize() {
+                canvas.width = window.innerWidth
+                canvas.height = window.innerHeight
+            }
+            window.addEventListener('resize', resize)
+            resize()
+            
+            let particles = []
+            
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * canvas.width
+                    this.y = Math.random() * canvas.height
+                    this.size = Math.random() * 3 + 1
+                    this.speedX = Math.random() * 0.5 - 0.25
+                    this.speedY = Math.random() * 0.5 - 0.25
+                }
+                
+                update() {
+                    this.x += this.speedX
+                    this.y += this.speedY
+                    
+                    if (this.x < 0 || this.x > canvas.width) this.speedX *= -1
+                    if (this.y < 0 || this.y > canvas.height) this.speedY *= -1
+                }
+                
+                draw() {
+                    ctx.fillStyle = '#00f0ff'
+                    ctx.beginPath()
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2)
+                    ctx.fill()
+                }
+            }
+            
+            function initParticles() {
+                particles = []
+                for (let i = 0; i < 120; i++) {
+                    particles.push(new Particle())
+                }
+            }
+            
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height)
+                
+                for (let i = 0; i < particles.length; i++) {
+                    particles[i].update()
+                    particles[i].draw()
+                    
+                    // Conexiones
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x
+                        const dy = particles[i].y - particles[j].y
+                        const distance = Math.sqrt(dx * dx + dy * dy)
+                        
+                        if (distance < 120) {
+                            ctx.strokeStyle = `rgba(0, 240, 255, ${1 - distance / 120})`
+                            ctx.lineWidth = 0.8
+                            ctx.beginPath()
+                            ctx.moveTo(particles[i].x, particles[i].y)
+                            ctx.lineTo(particles[j].x, particles[j].y)
+                            ctx.stroke()
+                        }
+                    }
+                }
+                requestAnimationFrame(animate)
+            }
+            
+            initParticles()
+            animate()
+            
+            // Canvas pequeño del hero
+            const heroCanvas = document.getElementById('heroCanvas')
+            if (heroCanvas) {
+                const hctx = heroCanvas.getContext('2d')
+                heroCanvas.width = 600
+                heroCanvas.height = 340
+                
+                let smallParticles = []
+                for (let i = 0; i < 40; i++) {
+                    smallParticles.push({
+                        x: Math.random() * 600,
+                        y: Math.random() * 340,
+                        vx: (Math.random() - 0.5) * 2,
+                        vy: (Math.random() - 0.5) * 2,
+                        r: Math.random() * 4 + 2
+                    })
+                }
+                
+                function animateHero() {
+                    hctx.clearRect(0, 0, 600, 340)
+                    smallParticles.forEach(p => {
+                        p.x += p.vx
+                        p.y += p.vy
+                        
+                        if (p.x < 0 || p.x > 600) p.vx *= -1
+                        if (p.y < 0 || p.y > 340) p.vy *= -1
+                        
+                        hctx.fillStyle = '#00f0ff'
+                        hctx.beginPath()
+                        hctx.arc(p.x, p.y, p.r, 0, Math.PI * 2)
+                        hctx.fill()
+                    })
+                    requestAnimationFrame(animateHero)
+                }
+                animateHero()
+            }
+        }
+        
+        // Datos de los temas
+        const topicsData = {
+            1: {
+                title: "Interacción gravitatoria",
+                emoji: "🌍",
+                content: `
+                    <h2 class="text-4xl font-bold mb-6">🌍 Interacción gravitatoria</h2>
+                    <ul class="space-y-4 text-lg">
+                        <li class="flex items-start gap-3"><span class="text-[#00f0ff] text-2xl">•</span> <strong>Ley de la Gravitación Universal:</strong> F = G·m₁·m₂/r²</li>
+                        <li class="flex items-start gap-3"><span class="text-[#00f0ff] text-2xl">•</span> Campo gravitatorio y aceleración de la gravedad</li>
+                        <li class="flex items-start gap-3"><span class="text-[#00f0ff] text-2xl">•</span> Energía potencial gravitatoria y conservación de la energía</li>
+                        <li class="flex items-start gap-3"><span class="text-[#00f0ff] text-2xl">•</span> Satélites y órbitas (velocidad orbital y escape)</li>
+                    </ul>
+                    <div class="mt-8 bg-black/50 p-6 rounded-2xl text-sm font-mono">
+                        Ejemplo típico EvAU: Cálculo de la velocidad de escape de la Tierra
+                    </div>
+                `
+            },
+            2: {
+                title: "Interacción electromagnética",
+                emoji: "⚡",
+                content: `
+                    <h2 class="text-4xl font-bold mb-6">⚡ Interacción electromagnética</h2>
+                    <ul class="space-y-4 text-lg">
+                        <li class="flex items-start gap-3"><span class="text-[#00f0ff] text-2xl">•</span> <strong>Campo eléctrico:</strong> E = k·Q/r²</li>
+                        <li class="flex items-start gap-3"><span class="text-[#00f0ff] text-2xl">•</span> Ley de Ohm y circuitos eléctricos</li>
+                        <li class="flex items-start gap-3"><span class="text-[#00f0ff] text-2xl">•</span> Campo magnético y fuerza de Lorentz</li>
+                        <li class="flex items-start gap-3"><span class="text-[#00f0ff] text-2xl">•</span> Inducción electromagnética (Ley de Faraday)</li>
+                        <li class="flex items-start gap-3"><span class="text-[#00f0ff] text-2xl">•</span> Corriente alterna y transformadores</li>
+                    </ul>
+                `
+            },
+            3: {
+                title: "Ondas y vibraciones",
+                emoji: "🌊",
+                content: `
+                    <h2 class="text-4xl font-bold mb-6">🌊 Ondas y vibraciones</h2>
+                    <ul class="space-y-4 text-lg">
+                        <li class="flex items-start gap-3"><span class="text-[#00f0ff] text-2xl">•</span> Movimiento Armónico Simple (MAS): x = A·cos(ωt + φ)</li>
+                        <li class="flex items-start gap-3"><span class="text-[#00f0ff] text-2xl">•</span> Energía en el MAS y resonancia</li>
+                        <li class="flex items-start gap-3"><span class="text-[#00f0ff] text-2xl">•</span> Ondas mecánicas: ecuación de onda y velocidad</li>
+                        <li class="flex items-start gap-3"><span class="text-[#00f0ff] text-2xl">•</span> Sonido, acústica y efecto Doppler</li>
+                    </ul>
+                `
+            },
+            4: {
+                title: "Óptica y luz",
+                emoji: "🔦",
+                content: `
+                    <h2 class="text-4xl font-bold mb-6">🔦 Óptica y luz</h2>
+                    <ul class="space-y-4 text-lg">
+                        <li class="flex items-start gap-3"><span class="text-[#00f0ff] text-2xl">•</span> Reflexión y refracción (Ley de Snell)</li>
+                        <li class="flex items-start gap-3"><span class="text-[#00f0ff] text-2xl">•</span> Lentes delgadas y espejos</li>
+                        <li class="flex items-start gap-3"><span class="text-[#00f0ff] text-2xl">•</span> Instrumentos ópticos (microscopio, telescopio)</li>
+                        <li class="flex items-start gap-3"><span class="text-[#00f0ff] text-2xl">•</span> Interferencias y difracción</li>
+                        <li class="flex items-start gap-3"><span class="text-[#00f0ff] text-2xl">•</span> Ondas electromagnéticas y espectro EM</li>
+                    </ul>
+                `
+            }
+        }
+        
+        // Mostrar modal de tema
+        function showTopicModal(id) {
+            const modal = document.getElementById('topicModal')
+            const content = document.getElementById('modal-content')
+            content.innerHTML = topicsData[id].content
+            modal.classList.remove('hidden')
+            modal.classList.add('flex')
+        }
+        
+        function hideTopicModal() {
+            const modal = document.getElementById('topicModal')
+            modal.classList.add('hidden')
+            modal.classList.remove('flex')
+        }
+        
+        // QUIZ - Preguntas oficiales (10 preguntas)
+        let currentQuestion = 0
+        let score = 0
+        let selectedAnswer = null    
